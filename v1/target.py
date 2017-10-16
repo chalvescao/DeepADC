@@ -54,7 +54,7 @@ class Target:
         wt = tf.constant(np.reshape(wt,[1,self.nBits]))
 
         # Encoded value from predicted bits
-        enc = tf.reduce_sum(wt*hpred,axis=1,keep_dims=True)
+        enc = tf.reduce_sum(wt*hpred,1,keep_dims=True)
 
         # Compute soft-loss
         loss = None
@@ -63,7 +63,7 @@ class Target:
             loss = tf.reduce_mean((wt)*(gt*actl[0] + (1-gt)*actl[1])) * np.float32(self.nBits)
             
         # Error in encoded numerical value
-        egt = tf.reduce_sum(wt*gt,axis=1,keep_dims=True)
+        egt = tf.reduce_sum(wt*gt,1,keep_dims=True)
         err1 = tf.reduce_mean(tf.abs(egt-enc))
         err2 = tf.sqrt(tf.reduce_mean(tf.square(egt-enc)))
 

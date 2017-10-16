@@ -69,7 +69,10 @@ tStep = opt.minimize(loss)
 # Restore model if necessary
 
 sess = tf.Session()
-sess.run(tf.global_variables_initializer())
+try:
+    sess.run(tf.global_variables_initializer())
+except:
+    sess.run(tf.initialize_all_variables())
 
 if ockp.latest is not None:
     mprint("Loading model")
