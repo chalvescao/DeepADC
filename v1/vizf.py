@@ -49,5 +49,6 @@ for m in mfiles:
     plt.hold(True)
     plt.plot(sigs.flatten(),bits.flatten(),'-g',linewidth=2)
     plt.plot(sigs.flatten(),enc.flatten(),'-r',linewidth=2)
+    plt.title(m)
     plt.savefig(m+'.png',dpi=120)
     plt.close()

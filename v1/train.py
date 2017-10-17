@@ -35,7 +35,7 @@ def mprint(s):
 #########################################################################
 # Training Parameters
 
-maxiter = 2e4
+maxiter = 1e4
 lr = 1e-2
 mom = 0.9
 

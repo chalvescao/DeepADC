@@ -14,8 +14,12 @@ class Target:
         self.omax = omax
         self.nBits = nBits
 
-    def rSamp(self,bsz=64):
-        sig = np.float32(self.imin + np.random.sample([bsz,1])*(self.imax-self.imin))
+    def rSamp(self,bsz=64,cg=16):
+        dl = np.linspace(0.,float(cg-1)*(self.omax-self.omin)/(2**(self.nBits+2)),cg)
+        dl = np.reshape(dl,[1,cg])
+        
+        sig = np.float32(self.imin + np.random.sample([bsz//cg,1])*(self.imax-self.imin-dl[0,-1]))
+        sig = np.reshape(sig+dl,[bsz,1])
         ovec = self.s2o(sig)
 
         return sig,ovec
@@ -59,8 +63,7 @@ class Target:
         # Compute soft-loss
         loss = None
         if actl is not None:
-            #loss = tf.reduce_mean((gt*actl[0] + (1-gt)*actl[1])) * np.float32(self.nBits)
-            loss = tf.reduce_mean((wt)*(gt*actl[0] + (1-gt)*actl[1])) * np.float32(self.nBits)
+            loss = tf.reduce_mean(wt*wt*(gt*actl[0] + (1-gt)*actl[1])) * np.float32(self.nBits)
             
         # Error in encoded numerical value
         egt = tf.reduce_sum(wt*gt,1,keep_dims=True)
