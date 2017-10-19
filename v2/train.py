@@ -35,8 +35,18 @@ def mprint(s):
 #########################################################################
 # Training Parameters
 
-maxiter = 1e4
-lr = 1e-2
+maxiter=2e4
+lr=1e-2
+
+# Phase 2
+#maxiter=3e4
+#lr = 3.16e-3 # / Sqrt (10)
+
+# Phase 3
+#maxiter = 4e4
+#lr = 1e-3     # / 10
+
+
 mom = 0.9
 
 bsz = 4096
