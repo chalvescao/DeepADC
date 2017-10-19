@@ -43,7 +43,7 @@ bsz = 4096
 bgroup = 256
 
 nBits = 8
-nHidden = 20
+nHidden = 24
 
 sfreq = 1e3      # How frequently to save
 
@@ -61,7 +61,7 @@ hpred, acl = ckt.encode(sig)
 _,loss,err1,err2 = data.Eval(gt,hpred,acl)
 
 opt = tf.train.AdamOptimizer(lr,mom)
-tStep = opt.minimize(loss)
+tStep = opt.minimize(loss+1e-3*tf.reduce_sum(tf.abs(ckt.wts['w1'])))
 
 
 #########################################################################

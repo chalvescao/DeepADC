@@ -43,7 +43,7 @@ bsz = 4096
 bgroup = 256
 
 nBits = 8
-nHidden = 20
+nHidden = 24
 
 sfreq = 1e3      # How frequently to save
 

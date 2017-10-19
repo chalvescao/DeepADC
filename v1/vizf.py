@@ -13,7 +13,7 @@ import target as tg
 
 # Copy from train
 nBits = 8
-nHidden = 20
+nHidden = 24
 
 
 #########################################################################

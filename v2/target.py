@@ -14,7 +14,7 @@ class Target:
         self.omax = omax
         self.nBits = nBits
 
-    def rSamp(self,bsz=64,cg=16):
+    def rSamp(self,bsz=64,cg=32):
         dl = np.linspace(0.,float(cg-1)*(self.omax-self.omin)/(2**(self.nBits+2)),cg)
         dl = np.reshape(dl,[1,cg])
         
@@ -66,10 +66,10 @@ class Target:
         # Compute soft-loss
         loss = None
         if actl is not None:
-            wtpn = tf.square(wt+enc1-egt)-tf.square(enc1-egt)
+            wtpn = tf.abs(wt+enc1-egt)-tf.abs(enc1-egt)
             
-            wtp = tf.nn.relu(-wtpn) + wt*wt*gt
-            wtn = tf.nn.relu(wtpn) + wt*wt*(1-gt)
+            wtp = tf.square(tf.nn.relu(-wtpn))
+            wtn = tf.square(tf.nn.relu(wtpn))
 
             loss = tf.reduce_mean(wtp*actl[0] + wtn*actl[1])
             
