@@ -52,7 +52,7 @@ mom = 0.9
 bsz = 4096
 bgroup = 256
 
-nBits = 8
+nBits = 5
 nHidden = 24
 
 sfreq = 1e3      # How frequently to save

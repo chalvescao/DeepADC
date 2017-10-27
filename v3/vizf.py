@@ -12,7 +12,7 @@ import circuit as ct
 import target as tg
 
 # Copy from train
-nBits = 8
+nBits = 5
 nHidden = 24
 
 

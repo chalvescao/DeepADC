@@ -15,7 +15,7 @@ def _unpack(x,num=None):
     
 
 class Target:
-    def __init__(self,imin=0,imax=1.0,omin=0.25,omax=0.75,nBits=8):
+    def __init__(self,imin=0,imax=1.0,omin=0.25,omax=0.75,nBits=5):
 
         self.imin = imin
         self.imax = imax
@@ -48,9 +48,9 @@ class Target:
         out = np.int64(out*(2**self.nBits-1))
         
         ovec = []
-        for i in range((self.nBits+1)//8):
-            ovec = ovec + [np.unpackbits(np.uint8(out%256),axis=1)[:,::-1]]
-            out = out // 256
+        for i in range((self.nBits+1)//self.nBits):
+            ovec = ovec + [np.unpackbits(np.uint8(out%(2**self.nBits)),axis=1)[:,::-1]]
+            out = out // (2**self.nBits) 
         if len(ovec) == 1:
             ovec = ovec[0]
         else:
