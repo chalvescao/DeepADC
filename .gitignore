@@ -2,3 +2,6 @@ __pycache__
 wts
 *.npz
 *.pyc
+.DS_Store
+.project
+.pydevproject
