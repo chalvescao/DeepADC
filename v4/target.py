@@ -23,11 +23,12 @@ class Target:
         self.omax = omax
         self.nBits = nBits
 
-    def rSamp(self,bsz=64):
-        dl = np.random.uniform(1.,2.)*2.0**(-self.nBits) 
-        dl = np.float32(np.reshape([-dl,dl],[2,1]))*0.49*(self.omax-self.omin)
+    def rSamp(self,bsz=64,cg=16):
+        #dl = np.random.uniform(1.,2.)*2.0**(-self.nBits) 
+        #dl = np.float32(np.reshape([-dl,dl],[2,1]))*0.49*(self.omax-self.omin)
+        dl = np.random.uniform(-4.,4.,size=[cg,bsz//cg])*2.0**(-self.nBits)
         
-        sig = np.float32(self.imin + np.random.sample([1,bsz//2])*(self.imax-self.imin-dl[0,-1]))
+        sig = np.float32(self.imin + np.random.sample([1,bsz//cg])*(self.imax-self.imin))
         sig = np.maximum(self.imin,np.minimum(self.imax,np.reshape(sig+dl,[bsz,1])))
         ovec = self.s2o(sig)
 

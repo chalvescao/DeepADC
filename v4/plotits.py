@@ -13,7 +13,7 @@ err2 = []
 loss = []
 
 for i in range(len(lines)):
-    m = re.search('.*[(\d+)].*Err1 = ([^ ,]*).*Err2 = ([^ ,]*).*Loss = ([^ ,]*)',lines[i])
+    m = re.search('.*\[(\d+)\].*Err1 = ([^ ,]*).*Err2 = ([^ ,]*).*Loss = ([^ ,]*)',lines[i])
     if m is not None:
         it.append(float(m.groups(0)[0]))
         err1.append(float(m.groups(0)[1]))
