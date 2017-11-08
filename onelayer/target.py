@@ -24,8 +24,6 @@ class Target:
         self.nBits = nBits
 
     def rSamp(self,bsz=64,cg=16):
-        #dl = np.random.uniform(1.,2.)*2.0**(-self.nBits) 
-        #dl = np.float32(np.reshape([-dl,dl],[2,1]))*0.49*(self.omax-self.omin)
         dl = np.random.uniform(-4.,4.,size=[cg,bsz//cg])*2.0**(-self.nBits)
         
         sig = np.float32(self.imin + np.random.sample([1,bsz//cg])*(self.imax-self.imin))
@@ -63,18 +61,24 @@ class Target:
 
     # Computes encoded value, error, and loss nodes
     # Call with tensors / placeholders
-    def Eval(self,gt,hpred,actl=None,ifd=True):
+    def Eval(self,sig,gt,hpred,actl=None,ifd=False,cwt=1.0):
         wt = np.float32(2**np.arange(self.nBits))
         wt = tf.constant(np.reshape(wt,[1,self.nBits]))
 
         # Encoded value from predicted bits
         hpred = tf.stop_gradient(hpred) # just in case
         enc = tf.reduce_sum(wt*hpred,1,keep_dims=True)
-        egt = tf.reduce_sum(wt*gt,1,keep_dims=True)
+        egtQ = tf.reduce_sum(wt*gt,1,keep_dims=True)
 
+        #egt = tf.clip_by_value(tf.stop_gradient(sig),self.omin,self.omax)-self.omin
+        egt = (sig - self.omin) * ((2**self.nBits)/(self.omax-self.omin))-0.5
+        egt = tf.clip_by_value(egt,-0.5,2**self.nBits-0.5)
+        
         # Compute soft-loss
         loss = None
         if actl is not None:
+            lossC = tf.reduce_mean(wt*wt*(gt*actl[0] + (1-gt)*actl[1])) * np.float32(self.nBits) * cwt
+
             enc0 = enc-wt*hpred
             enc1 = enc0+wt
 
@@ -94,7 +98,6 @@ class Target:
                 at02 = _unpack(tf.reshape(actl[0],[2,-1,self.nBits]))
                 at12 = _unpack(tf.reshape(actl[1],[2,-1,self.nBits]))
                 
-
                 gdiff = egt2[0]-egt2[1]
 
                 wtpn = tf.abs(en12[0]-hpd2[1] - gdiff) - tf.abs(en02[0]-hpd2[1] - gdiff)
@@ -107,13 +110,13 @@ class Target:
                 wtn = tf.square(tf.nn.relu(wtpn))
                 loss1b = tf.reduce_mean(wtp*at02[1] + wtn*at12[1])
 
-                loss = loss0+0.5*(loss1a+loss1b)
+                loss = lossC+loss0+0.5*(loss1a+loss1b)
             else:
-                loss = loss0
+                loss = lossC+loss0
                 
         # Error in encoded numerical value
-        err1 = tf.reduce_mean(tf.abs(egt-enc))
-        err2 = tf.sqrt(tf.reduce_mean(tf.square(egt-enc)))
+        err1 = tf.reduce_mean(tf.abs(egtQ-enc))
+        err2 = tf.sqrt(tf.reduce_mean(tf.square(egtQ-enc)))
 
         return [enc,loss,err1,err2]
             

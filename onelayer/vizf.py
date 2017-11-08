@@ -33,7 +33,7 @@ gt = tf.placeholder(dtype=tf.float32)
 sig = tf.placeholder(dtype=tf.float32)
 hpred, acl = ckt.encode(sig)
 
-enc_t = data.Eval(gt,hpred,acl)[0]
+enc_t = data.Eval(sig,gt,hpred,acl)[0]
 
 #########################################################################
 # Start TF session

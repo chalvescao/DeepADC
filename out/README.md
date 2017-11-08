@@ -1,5 +1,46 @@
 # Results 
 
+## 9/8/2017
+
+- Running new code in onelayer
+  - Leave out derivative cost
+  - Add different weighted versions of original 'classification' cost
+  - Make the 'difference' cost be wrt un-quantized version
+  - Conclusion: for fewer bits, helps to have higher weight on classification cost
+
+### 8 Bits (64 hidden)
+
+- Weight 0.5 on classification cost
+<img src="9.8.ayan/b8h64_c.5.png" height=400px>
+- Weight 1 on classification cost
+<img src="9.8.ayan/b8h64_c1.png" height=400px>
+- Weight 2 on classification cost
+<img src="9.8.ayan/b8h64_c2.png" height=400px>
+- Weight 4 on classification cost
+<img src="9.8.ayan/b8h64_c4.png" height=400px>
+
+### 6 Bits (36 hidden)
+
+- Weight 0.5 on classification cost
+<img src="9.8.ayan/b6h36_c.5.png" height=400px>
+- Weight 1 on classification cost
+<img src="9.8.ayan/b6h36_c1.png" height=400px>
+- Weight 2 on classification cost
+<img src="9.8.ayan/b6h36_c2.png" height=400px>
+- Weight 4 on classification cost
+<img src="9.8.ayan/b6h36_c4.png" height=400px>
+
+### 4 Bits (16 hidden)
+
+- Weight 0.5 on classification cost
+<img src="9.8.ayan/b4h16_c.5.png" height=400px>
+- Weight 1 on classification cost
+<img src="9.8.ayan/b4h16_c1.png" height=400px>
+- Weight 2 on classification cost
+<img src="9.8.ayan/b4h16_c2.png" height=400px>
+- Weight 4 on classification cost
+<img src="9.8.ayan/b4h16_c4.png" height=400px>
+
 ## 9/4/2017
 
 - Running code in onelayer

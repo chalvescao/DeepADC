@@ -37,12 +37,13 @@ sfreq = 1e3      # How frequently to save
 #########################################################################
 # Get params from command line
 #########################################################################
-if len(sys.argv) != 5:
-    sys.exit("USAGE: train.py nBits nHidden wtsdir withDLoss")
+if len(sys.argv) != 6:
+    sys.exit("USAGE: train.py nBits nHidden wtsdir withDLoss CWT")
 nBits = int(sys.argv[1])
 nHidden = int(sys.argv[2])
 wtdir = sys.argv[3]
 ifDeriv = sys.argv[4] == 'Y'
+cwt = float(sys.argv[5])
 #########################################################################
 
 
@@ -73,7 +74,7 @@ gt = tf.placeholder(dtype=tf.float32)
 sig = tf.placeholder(dtype=tf.float32)
 hpred, acl = ckt.encode(sig)
 
-_,loss,err1,err2 = data.Eval(gt,hpred,acl,ifDeriv)
+_,loss,err1,err2 = data.Eval(sig,gt,hpred,acl,ifDeriv,cwt)
 
 lr = tf.placeholder(dtype=tf.float32)
 opt = tf.train.AdamOptimizer(lr,mom)
@@ -85,7 +86,8 @@ tStep = opt.minimize(loss+ WD * ( \
 # Start TF session (respecting OMP_NUM_THREADS)
 # Restore model if necessary
 
-gopt = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+#gopt = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+gopt = tf.GPUOptions(allow_growth=True)
 sess = tf.Session(config=tf.ConfigProto(gpu_options=gopt))
 try:
     sess.run(tf.global_variables_initializer())
