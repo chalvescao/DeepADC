@@ -23,7 +23,7 @@ def activ2L(x):
 class Circuit:
     def __init__(self,nHidden=4,nBits=8):
         self.wts = {}
-        self.wts['w0'] =  tf.Variable(tf.random_uniform([1,nHidden],minval=-1.0,maxval=1.0,dtype=tf.float32))
+        self.wts['w0'] =  tf.Variable(tf.random_uniform([1,nHidden],minval=-np.sqrt(3.0),maxval=np.sqrt(3.0),dtype=tf.float32))
         # Change bias init to center based on our new activation
         self.wts['b0'] =  tf.Variable(tf.constant(0.48,shape=[nHidden],dtype=tf.float32))
         
@@ -31,10 +31,6 @@ class Circuit:
         self.wts['bf'] =  tf.Variable(tf.constant(0,shape=[nBits],dtype=tf.float32))
 
     def encode(self,x):
-        w0 = self.wts['w0']
-        w0b = tf.stop_gradient(w0)
-        w0 = w0 + tf.clip_by_value(w0b,-1.0,1.0) - w0b
-        
-        y = tf.matmul(x,w0)+self.wts['b0']
+        y = tf.matmul(x,self.wts['w0'])+self.wts['b0']
         y = tf.matmul(activ1(y)-0.6,self.wts['wf']) + self.wts['bf']
         return [activ2(y), activ2L(y)]
