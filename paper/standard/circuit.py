@@ -27,19 +27,26 @@ def activ2L(x):
 class Circuit:
     def __init__(self,nHidden=4,nBits=8):
         self.wts = {}
-
-
         w0 = np.float32(np.random.uniform(-0.5,0.5,[1,nHidden]))
+        
         self.wts['w0'] =  tf.Variable(tf.constant(w0,shape=[1,nHidden]),dtype=tf.float32)
-        self.wts['b0'] =  tf.Variable(tf.constant(MID_IN,shape=[nHidden]),dtype=tf.float32)
+        b0 = -0.5*w0 + MID_IN
+        self.wts['b0'] =  tf.Variable(tf.constant(b0,shape=[nHidden]),dtype=tf.float32)
         
         wf = np.float32(np.random.uniform(-np.sqrt(3.0/nHidden),np.sqrt(3.0/nHidden),[nHidden,nBits]))
         self.wts['wf'] =  tf.Variable(tf.constant(wf,shape=[nHidden,nBits]),dtype=tf.float32)
         bf = np.float32(-MID_OUT*np.sum(wf,axis=0))
         self.wts['bf'] =  tf.Variable(tf.constant(bf,shape=[nBits]),dtype=tf.float32)
 
+        v = tf.clip_by_value(self.wts['w0'],-1.0,1.0)
+        v1 = tf.abs(v) / tf.maximum(1e-8,tf.abs(self.wts['w0']))
+        v1 = (self.wts['b0'] - MID_IN)*tf.reshape(v1,[-1]) + MID_IN
+        v1 = tf.clip_by_value(v1,-VDD,VDD)
+        
+        with tf.control_dependencies([v,v1]):
+            self.cOp = [tf.assign(self.wts['w0'],v),tf.assign(self.wts['b0'],v1)]
+
     def encode(self,x):
-        w0 = tf.nn.tanh(self.wts['w0'])
-        y = tf.matmul(x,w0)+self.wts['b0']
+        y = tf.matmul(x,self.wts['w0'])+self.wts['b0']
         y = tf.matmul(activ1(y),self.wts['wf']) + self.wts['bf']
         return [activ2(y), activ2L(y)]

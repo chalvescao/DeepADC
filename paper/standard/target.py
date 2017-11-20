@@ -14,7 +14,7 @@ def _unpack(x,num=None):
     
 
 class Target:
-    def __init__(self,imin=0,imax=1.0,omin=0.25,omax=0.75,nBits=5):
+    def __init__(self,imin=0,imax=1.0,omin=0.0,omax=1.0,nBits=5):
 
         self.imin = imin
         self.imax = imax

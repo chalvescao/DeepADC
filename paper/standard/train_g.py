@@ -10,7 +10,7 @@ import ctrlc
 
 import utils as ut
 import circuit as ct
-import target as tg
+import graytg as tg
 
 #########################################################################
 # Training Parameters
@@ -41,11 +41,11 @@ sfreq = 1e3      # How frequently to save
 # Get params from command line
 #########################################################################
 if len(sys.argv) != 5:
-    sys.exit("USAGE: train.py nBits nHidden wtsdir CWT")
-nBits = int(sys.argv[1])
-nHidden = int(sys.argv[2])
-wtdir = sys.argv[3]
-cwt = float(sys.argv[4])
+    sys.exit("USAGE: train.py nBits1 nBits2 nHidden wtsdir")
+nBits1 = int(sys.argv[1])
+nBits2 = int(sys.argv[2])
+nHidden = int(sys.argv[3])
+wtdir = sys.argv[4]
 #########################################################################
 
 
@@ -69,14 +69,14 @@ def mprint(s):
     
 #########################################################################
 # Actual model
-data = tg.Target(nBits=nBits)
-ckt = ct.Circuit(nHidden=nHidden,nBits=nBits)
+data = tg.Target(nBits1=nBits1,nBits2=nBits2)
+ckt = ct.Circuit(nHidden=nHidden,nBits=nBits2)
 
 gt = tf.placeholder(dtype=tf.float32)
 sig = tf.placeholder(dtype=tf.float32)
 hpred, acl = ckt.encode(sig)
 
-_,loss,err1,err2 = data.Eval(sig,gt,hpred,acl,cwt)
+loss,err1 = data.Eval(gt,hpred,acl)
 
 lr = tf.placeholder(dtype=tf.float32)
 opt = tf.train.AdamOptimizer(lr,mom)
@@ -112,18 +112,16 @@ niter = ockp.iter
 mprint("Starting from Iteration %d" % niter)
 while niter < maxiter:
 
-    e1v_a, e2v_a, lv_a = 0., 0., 0.
+    e1v_a, lv_a = 0., 0.
     for i in range(bgroup):
         sigs,bits = data.rSamp(bsz)
-        e1v,e2v,lv,_ = sess.run([err1,err2,loss,tStep],feed_dict={gt: bits, sig: sigs,lr: getlr(niter)})
+        e1v,lv,_ = sess.run([err1,loss,tStep],feed_dict={gt: bits, sig: sigs,lr: getlr(niter)})
         
         e1v_a = e1v_a+e1v
-        e2v_a = e2v_a+e2v
         lv_a = lv_a+lv
     e1v_a = e1v_a / bgroup
-    e2v_a = e2v_a / bgroup
     lv_a = lv_a / bgroup
-    mprint("[%09d] lr = %.2e, Err1 = %.4e, Err2 = %.4e, Loss = %.4e" % (niter, getlr(niter), e1v_a, e2v_a, lv_a))
+    mprint("[%09d] lr = %.2e, Err1 = %.4e, Loss = %.4e" % (niter, getlr(niter), e1v_a, lv_a))
     niter=niter+1
     if niter % RESETITER == 0:
         sess.run(rStep)

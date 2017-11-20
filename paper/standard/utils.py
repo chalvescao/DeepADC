@@ -53,7 +53,18 @@ def netsave(net,fname,sess):
         wts[k] = net.wts[k].eval(sess)
     np.savez(fname,**wts)
 
-
+# Reset Optimizer state
+def resetopt(opt,vdict):
+    ops = []
+    ops.append(tf.assign(opt._beta1_power,opt._beta1))
+    ops.append(tf.assign(opt._beta2_power,opt._beta2))
+    for nm in vdict.keys():
+        v = vdict[nm]
+        ops.append(opt.get_slot(v,'m').initializer)
+        ops.append(opt.get_slot(v,'v').initializer)
+    return ops
+    
+    
 # Save Optimizer state (Assume Adam)
 def saveopt(opt,vdict,others,fname,sess):
     weights = {}
