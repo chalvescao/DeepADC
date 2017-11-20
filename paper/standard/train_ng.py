@@ -9,7 +9,7 @@ import numpy as np
 import ctrlc
 
 import utils as ut
-import circuit as ct
+import circuitn as ct
 import graytg as tg
 
 #########################################################################
@@ -40,12 +40,13 @@ sfreq = 1e3      # How frequently to save
 #########################################################################
 # Get params from command line
 #########################################################################
-if len(sys.argv) != 5:
-    sys.exit("USAGE: train.py nBits1 nBits2 nHidden wtsdir")
+if len(sys.argv) != 6:
+    sys.exit("USAGE: train.py nBits1 nBits2 nHidden nzstd wtsdir")
 nBits1 = int(sys.argv[1])
 nBits2 = int(sys.argv[2])
 nHidden = int(sys.argv[3])
-wtdir = sys.argv[4]
+nzstd = float(sys.argv[4])
+wtdir = sys.argv[5]
 #########################################################################
 
 
@@ -70,7 +71,7 @@ def mprint(s):
 #########################################################################
 # Actual model
 data = tg.Target(nBits1=nBits1,nBits2=nBits2)
-ckt = ct.Circuit(nHidden=nHidden,nBits=nBits2)
+ckt = ct.Circuit(nHidden=nHidden,nBits=nBits2,nzstd=nzstd)
 
 gt = tf.placeholder(dtype=tf.float32)
 sig = tf.placeholder(dtype=tf.float32)

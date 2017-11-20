@@ -87,7 +87,7 @@ class Circuit:
 
         y = np.matmul(x,R0p)/(R0p+RGS) - np.matmul(x,R0n)/(R0n+RGS) + V0
         y = vtc.act(y)
-        y  = np.matmul(y,R1p)/(RGS+sum(R1p,0)) - np.matmul(y,R1n)/(RGS+sum(R1n,0)) + V1
+        y  = np.matmul(y,R1p)/(RGS+np.sum(R1p,0)) - np.matmul(y,R1n)/(RGS+np.sum(R1n,0)) + V1
         return np.float32(y > 0)
         
 
@@ -97,6 +97,10 @@ class Circuit:
 import sys
 
 ckt = Circuit(sys.argv[1])
+
+if len(sys.argv) == 3:
+    if sys.argv[2] != 0:
+        ckt.pert(float(sys.argv[2]))
 
 tm =  np.linspace(0.,2*np.pi,2**20)
 signal = 0.5 + 0.5 * np.sin(tm)
@@ -122,7 +126,7 @@ SINAD = 10*np.log10( np.var(gt) + mse) - 10*np.log10(mse)
 ENOB = (SINAD-1.76)/6.02
 print("ENOB = %.2f (%d)" % (ENOB,ckt.nBits))
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 4:
     import matplotlib as mp
     mp.use('Agg')
     import matplotlib.pyplot as plt
@@ -131,4 +135,4 @@ if len(sys.argv) == 3:
     plt.xlim([-0.1,2*np.pi+0.1])
     plt.ylim([-0.1,1.1])
     plt.title("%d Bits, %d Hidden Neurons: ENOB = %.2f" % (ckt.nBits,ckt.nHidden,ENOB))
-    plt.savefig(sys.argv[2],dpi=120)
+    plt.savefig(sys.argv[3],dpi=120)

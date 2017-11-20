@@ -83,7 +83,9 @@ class Target:
         
         loss = None
         if actl is not None:
-            loss = tf.reduce_mean(gt*actl[0] + (1-gt)*actl[1])
+            loss = tf.reduce_sum(gt*actl[0]+(1-gt)*actl[1],1)
+            loss = tf.reduce_mean(loss**2)
+            #loss = tf.reduce_mean(gt*actl[0] + (1-gt)*actl[1])
                 
         return [loss,err1]
             
