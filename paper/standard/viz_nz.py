@@ -96,37 +96,35 @@ class Circuit:
 
 import sys
 
-ckt = Circuit(sys.argv[1])
-
 tm =  np.linspace(0.,2*np.pi,2**20)
 signal = 0.5 + 0.5 * np.sin(tm)
 
-quant = ckt.encode(signal)
 
-wts = 2**np.float32(np.arange(ckt.nBits))
-val = np.float32(np.sum(wts*quant,1)) # Binary Representation
+enobs = []
+for it in range(100):
+    ckt = Circuit(sys.argv[1])
+    ckt.pert(float(sys.argv[2]))
 
-# Best decoder
-vs = np.unique(val)
-val2 = val.copy()
-for v in vs:
-    o = np.mean(signal[val2 == v])
-    val[val2 == v] = o
+    quant = ckt.encode(signal)
 
-gt = signal
+    wts = 2**np.float32(np.arange(ckt.nBits))
+    val = np.float32(np.sum(wts*quant,1))
+    vs = np.unique(val)
+    val2 = val.copy()
+    for v in vs:
+        o = np.mean(signal[val2 == v])
+        val[val2 == v] = o
 
-mse = np.mean((gt-val)**2)
-SINAD = 10*np.log10( np.var(gt) + mse) - 10*np.log10(mse)
-ENOB = (SINAD-1.76)/6.02
-print("ENOB = %.2f (%d)" % (ENOB,ckt.nBits))
+    gt = signal
 
-if len(sys.argv) == 3:
-    import matplotlib as mp
-    mp.use('Agg')
-    import matplotlib.pyplot as plt
-    plt.plot(tm,gt,'-g',linewidth=1.5)
-    plt.plot(tm,val,'-r',linewidth=1.5)
-    plt.xlim([-0.1,2*np.pi+0.1])
-    plt.ylim([-0.1,1.1])
-    plt.title("%d Bits, %d Hidden Neurons: ENOB = %.2f" % (ckt.nBits,ckt.nHidden,ENOB))
-    plt.savefig(sys.argv[2],dpi=120)
+    mse = np.mean((gt-val)**2)
+    SINAD = 10*np.log10( np.var(gt) + mse) - 10*np.log10(mse)
+    ENOB = (SINAD-1.76)/6.02
+    enobs.append(ENOB)
+
+enobs = np.sort(np.float32(enobs))
+q25 = enobs[25]
+q50 = enobs[50]
+q75 = enobs[75]
+
+print("ENOB: (%.3f, %.3f, %.3f)" % (q25,q50,q75))
